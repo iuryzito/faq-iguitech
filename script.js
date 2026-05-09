@@ -203,12 +203,14 @@ function selectSearchResult(index = state.activeSearchIndex) {
 function openSearch() {
   state.searchOpen = true;
   renderSearchPopover();
+  syncMobileTopbar();
   document.getElementById("searchInput").focus();
 }
 
 function closeSearch() {
   state.searchOpen = false;
   renderSearchPopover();
+  syncMobileTopbar();
 }
 
 function highlightMatch(text, query) {
@@ -676,6 +678,18 @@ function closeMobileMenu() {
   document.body.classList.remove("sidebar-open");
 }
 
+function syncMobileTopbar() {
+  const isMobile = window.matchMedia("(max-width: 900px)").matches;
+  const shouldHide = isMobile && window.scrollY > 28 && !state.searchOpen;
+  document.body.classList.toggle("mobile-topbar-hidden", shouldHide);
+}
+
+window.addEventListener("scroll", syncMobileTopbar, { passive: true });
+window.addEventListener("resize", () => {
+  syncMobileTopbar();
+  if (state.searchOpen) renderSearchPopover();
+});
+
 document.getElementById("lightTheme").addEventListener("click", () => setTheme("light"));
 document.getElementById("darkTheme").addEventListener("click", () => setTheme("dark"));
 
@@ -683,4 +697,5 @@ setTheme(localStorage.getItem("iguitech-help-theme") || "dark");
 renderSearchPopover();
 renderNav();
 loadPage(location.hash.replace("#", "") || pages[0].id, false);
+syncMobileTopbar();
 
