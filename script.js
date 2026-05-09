@@ -122,6 +122,7 @@ function getSearchResults(query) {
 
 function renderSearchPopover() {
   const popover = document.getElementById("searchPopover");
+  const searchBox = document.querySelector(".top-search");
   const resultsEl = document.getElementById("searchResults");
   const countEl = document.getElementById("searchCount");
   const clearBtn = document.getElementById("searchClear");
@@ -129,8 +130,16 @@ function renderSearchPopover() {
   const hasQuery = Boolean(state.query);
 
   popover.hidden = !state.searchOpen;
+  document.body.classList.toggle("search-open", state.searchOpen);
   countEl.textContent = hasQuery ? `${results.length} resultado${results.length === 1 ? "" : "s"}` : "";
   clearBtn.classList.toggle("visible", hasQuery);
+
+  if (state.searchOpen && searchBox && window.matchMedia("(min-width: 901px)").matches) {
+    const rect = searchBox.getBoundingClientRect();
+    popover.style.setProperty("--search-left", `${rect.left}px`);
+    popover.style.setProperty("--search-top", `${rect.bottom + 8}px`);
+    popover.style.setProperty("--search-width", `${Math.max(rect.width, 520)}px`);
+  }
 
   if (!state.searchOpen) return;
 
@@ -604,6 +613,8 @@ document.getElementById("searchInput").addEventListener("focus", () => {
   state.searchOpen = true;
   renderSearchPopover();
 });
+
+document.querySelector(".top-search").addEventListener("click", () => openSearch());
 
 document.getElementById("searchClear").addEventListener("click", () => {
   state.query = "";
