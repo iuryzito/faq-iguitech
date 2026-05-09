@@ -189,6 +189,10 @@ input {
   box-shadow: 0 0 0 4px rgba(0, 239, 25, .08);
 }
 
+.top-search.search-pulse {
+  animation: searchPulse .34s ease;
+}
+
 .top-search input {
   min-width: 0;
   border: 0;
@@ -840,7 +844,11 @@ code {
   }
 
   .top-nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     white-space: nowrap;
+    text-align: center;
   }
 
   .pill-link {
@@ -850,6 +858,7 @@ code {
 
   .support-link {
     min-height: 38px;
+    justify-content: center;
   }
 
   .top-search {
@@ -860,6 +869,11 @@ code {
     place-items: center;
     padding: 0;
     border-radius: 999px;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+
+  .top-search:active {
+    transform: scale(.94);
   }
 
   .top-search input,
@@ -983,6 +997,8 @@ code {
 
   .top-nav a {
     min-height: 36px;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
   }
 
@@ -1001,6 +1017,7 @@ code {
     min-width: 38px;
     padding: 0;
     overflow: hidden;
+    justify-content: center;
   }
 
   .support-link .whatsapp-mark {
@@ -1064,5 +1081,21 @@ code {
   .theme-switcher {
     right: 14px;
     bottom: 14px;
+  }
+}
+
+@keyframes searchPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 0 0 0 rgba(0, 239, 25, .35);
+  }
+  55% {
+    transform: scale(1.08);
+    border-color: var(--line-strong);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 0 0 8px rgba(0, 239, 25, .12);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 0 0 0 rgba(0, 239, 25, 0);
   }
 }

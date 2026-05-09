@@ -617,6 +617,15 @@ document.getElementById("searchInput").addEventListener("focus", () => {
 });
 
 document.querySelector(".top-search").addEventListener("click", () => openSearch());
+document.querySelector(".top-search").addEventListener("pointerdown", () => {
+  const search = document.querySelector(".top-search");
+  search.classList.remove("search-pulse");
+  window.requestAnimationFrame(() => search.classList.add("search-pulse"));
+});
+
+document.querySelector(".top-search").addEventListener("animationend", () => {
+  document.querySelector(".top-search").classList.remove("search-pulse");
+});
 
 document.getElementById("searchClear").addEventListener("click", () => {
   state.query = "";
