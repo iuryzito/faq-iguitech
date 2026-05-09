@@ -1,6 +1,8 @@
 ﻿const state = {
   activeId: null,
   query: "",
+  searchOpen: false,
+  activeSearchIndex: 0,
   openGroups: new Set(),
   closedGroups: new Set(),
 };
@@ -63,11 +65,6 @@ function renderNav() {
   const nav = document.getElementById("navTree");
   nav.innerHTML = "";
 
-  if (state.query) {
-    renderSearchResults(nav);
-    return;
-  }
-
   nav.appendChild(renderHomeShortcut());
 
   MENU_ROOTS.forEach((root) => {
@@ -112,6 +109,111 @@ function renderSearchResults(nav) {
 
   visible.slice(0, 60).forEach((page) => wrap.appendChild(renderPageButton(page, 0)));
   nav.appendChild(wrap);
+}
+
+function getSearchResults(query) {
+  return pages
+    .map((page) => ({ page, score: searchScore(page, query) }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.page)
+    .slice(0, 40);
+}
+
+function renderSearchPopover() {
+  const popover = document.getElementById("searchPopover");
+  const resultsEl = document.getElementById("searchResults");
+  const countEl = document.getElementById("searchCount");
+  const clearBtn = document.getElementById("searchClear");
+  const results = getSearchResults(state.query);
+  const hasQuery = Boolean(state.query);
+
+  popover.hidden = !state.searchOpen;
+  countEl.textContent = hasQuery ? `${results.length} resultado${results.length === 1 ? "" : "s"}` : "";
+  clearBtn.classList.toggle("visible", hasQuery);
+
+  if (!state.searchOpen) return;
+
+  if (!hasQuery) {
+    resultsEl.innerHTML = `
+      <div class="search-empty-state">
+        <strong>Pesquise em toda a FAQ</strong>
+        <span>Digite uma palavra para encontrar artigos por título, menu, texto, link, arquivo ou imagem.</span>
+      </div>
+    `;
+    return;
+  }
+
+  if (!results.length) {
+    resultsEl.innerHTML = `
+      <div class="search-empty-state">
+        <strong>Nenhum resultado encontrado</strong>
+        <span>Tente buscar por outro termo, recurso, menu ou canal.</span>
+      </div>
+    `;
+    return;
+  }
+
+  if (state.activeSearchIndex >= results.length) state.activeSearchIndex = 0;
+
+  resultsEl.innerHTML = results.map((page, index) => searchResultTemplate(page, index)).join("");
+  resultsEl.querySelectorAll("[data-search-page]").forEach((button) => {
+    button.addEventListener("mouseenter", () => {
+      state.activeSearchIndex = Number(button.dataset.index);
+      renderSearchPopover();
+    });
+    button.addEventListener("click", () => selectSearchResult(Number(button.dataset.index)));
+  });
+}
+
+function searchResultTemplate(page, index) {
+  const query = state.query;
+  const crumb = page.breadcrumbs.length ? page.breadcrumbs.join(" › ") : "Central de Ajuda";
+  const summary = cleanSentence(page.summary || page.topics[0] || "Abrir artigo da Central de Ajuda IGUITECH.");
+  return `
+    <button class="search-result ${index === state.activeSearchIndex ? "active" : ""}" data-search-page="${page.id}" data-index="${index}" type="button">
+      <span class="result-icon" aria-hidden="true">${iconFor(page.title)}</span>
+      <span class="result-body">
+        <span class="result-crumbs">${highlightMatch(crumb, query)}</span>
+        <strong>${highlightMatch(page.title, query)}</strong>
+        <small>${highlightMatch(summary, query)}</small>
+      </span>
+      <span class="result-arrow" aria-hidden="true">${index === state.activeSearchIndex ? "↵" : "›"}</span>
+    </button>
+  `;
+}
+
+function selectSearchResult(index = state.activeSearchIndex) {
+  const results = getSearchResults(state.query);
+  const page = results[index];
+  if (!page) return;
+  closeSearch();
+  loadPage(page.id);
+}
+
+function openSearch() {
+  state.searchOpen = true;
+  renderSearchPopover();
+  document.getElementById("searchInput").focus();
+}
+
+function closeSearch() {
+  state.searchOpen = false;
+  renderSearchPopover();
+}
+
+function highlightMatch(text, query) {
+  const safe = escapeHtml(cleanSentence(text));
+  const normalizedQuery = normalizeSearch(query);
+  if (!normalizedQuery) return safe;
+  const terms = normalizedQuery.split(/\s+/).filter((term) => term.length > 1);
+  if (!terms.length) return safe;
+  const pattern = terms.map(escapeRegExp).join("|");
+  return safe.replace(new RegExp(`(${pattern})`, "gi"), "<mark>$1</mark>");
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function renderMenuItem(page, depth) {
@@ -493,13 +595,50 @@ function setTheme(theme) {
 
 document.getElementById("searchInput").addEventListener("input", (event) => {
   state.query = event.target.value.trim();
-  renderNav();
+  state.searchOpen = true;
+  state.activeSearchIndex = 0;
+  renderSearchPopover();
+});
+
+document.getElementById("searchInput").addEventListener("focus", () => {
+  state.searchOpen = true;
+  renderSearchPopover();
+});
+
+document.getElementById("searchClear").addEventListener("click", () => {
+  state.query = "";
+  state.activeSearchIndex = 0;
+  document.getElementById("searchInput").value = "";
+  renderSearchPopover();
+  document.getElementById("searchInput").focus();
 });
 
 document.addEventListener("keydown", (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
     event.preventDefault();
-    document.getElementById("searchInput").focus();
+    openSearch();
+    return;
+  }
+
+  if (!state.searchOpen) return;
+
+  const results = getSearchResults(state.query);
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    state.activeSearchIndex = results.length ? (state.activeSearchIndex + 1) % results.length : 0;
+    renderSearchPopover();
+  }
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    state.activeSearchIndex = results.length ? (state.activeSearchIndex - 1 + results.length) % results.length : 0;
+    renderSearchPopover();
+  }
+  if (event.key === "Enter" && document.activeElement === document.getElementById("searchInput")) {
+    event.preventDefault();
+    selectSearchResult();
+  }
+  if (event.key === "Escape") {
+    closeSearch();
   }
 });
 
@@ -510,6 +649,12 @@ document.getElementById("menuButton").addEventListener("click", () => {
 });
 
 document.getElementById("sidebarBackdrop").addEventListener("click", () => closeMobileMenu());
+
+document.addEventListener("mousedown", (event) => {
+  if (!state.searchOpen) return;
+  if (event.target.closest(".top-search") || event.target.closest(".search-panel")) return;
+  closeSearch();
+});
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeMobileMenu();
@@ -524,6 +669,7 @@ document.getElementById("lightTheme").addEventListener("click", () => setTheme("
 document.getElementById("darkTheme").addEventListener("click", () => setTheme("dark"));
 
 setTheme(localStorage.getItem("iguitech-help-theme") || "dark");
+renderSearchPopover();
 renderNav();
 loadPage(location.hash.replace("#", "") || pages[0].id, false);
 

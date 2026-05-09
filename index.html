@@ -22,12 +22,25 @@
       <a class="text-link" href="#conta-meu-perfil">Renovação</a>
     </nav>
 
-    <label class="top-search" for="searchInput">
+    <div class="top-search">
       <span aria-hidden="true">⌕</span>
-      <input id="searchInput" type="search" placeholder="Perguntar ou buscar..." autocomplete="off">
+      <input id="searchInput" type="search" placeholder="Perguntar ou buscar..." autocomplete="off" aria-label="Pesquisar na FAQ">
+      <button class="search-clear" id="searchClear" type="button" aria-label="Limpar busca">×</button>
+      <span class="search-count" id="searchCount"></span>
       <kbd>Ctrl</kbd><kbd>K</kbd>
-    </label>
+    </div>
   </header>
+
+  <div class="search-popover" id="searchPopover" hidden>
+    <div class="search-panel" role="dialog" aria-label="Resultados da busca">
+      <div class="search-results-list" id="searchResults"></div>
+      <div class="search-footer">
+        <span><kbd>↑</kbd><kbd>↓</kbd> Navegar</span>
+        <span><kbd>Enter</kbd> Abrir</span>
+        <span><kbd>Esc</kbd> Fechar</span>
+      </div>
+    </div>
+  </div>
 
   <div class="app-shell">
     <button class="sidebar-backdrop" id="sidebarBackdrop" aria-label="Fechar menu"></button>
