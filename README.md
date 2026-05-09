@@ -2,6 +2,8 @@
 
 Central de ajuda estática da IGUITECH, pronta para GitHub Pages ou servidor próprio.
 
+Domínio de produção: https://faq.iguitech.com/
+
 ## Arquivos principais
 
 - `index.html`
