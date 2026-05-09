@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Central de Ajuda IGUITECH</title>
+  <meta name="description" content="Central de ajuda IGUITECH com guias de configuração, atendimento, integrações e operação da plataforma.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-topbar">
+    <a class="top-logo" href="#home" aria-label="IGUITECH">
+      <img src="https://i.ibb.co/8LvGR2dd/lg-site.png" alt="IGUITECH">
+    </a>
+
+    <nav class="top-nav" aria-label="Navegação principal">
+      <a class="pill-link" href="https://app.iguitech.com/#/signup">Assinar</a>
+      <a class="text-link support-link" href="https://wa.me/5599991395512" target="_blank" rel="noopener">
+        <span class="whatsapp-mark" aria-hidden="true">☎</span> Suporte
+      </a>
+      <a class="text-link" href="#configuracao-administrador-visao-geral-admin">Roadmap</a>
+      <a class="text-link" href="#conta-meu-perfil">Renovação</a>
+    </nav>
+
+    <label class="top-search" for="searchInput">
+      <span aria-hidden="true">⌕</span>
+      <input id="searchInput" type="search" placeholder="Perguntar ou buscar..." autocomplete="off">
+      <kbd>Ctrl</kbd><kbd>K</kbd>
+    </label>
+  </header>
+
+  <div class="app-shell">
+    <button class="sidebar-backdrop" id="sidebarBackdrop" aria-label="Fechar menu"></button>
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand">
+        <img src="https://i.ibb.co/8LvGR2dd/lg-site.png" alt="IGUITECH">
+      </div>
+      <nav id="navTree" class="nav-tree" aria-label="Categorias da central"></nav>
+    </aside>
+
+    <main class="content-area">
+      <header class="mobile-bar">
+        <button class="icon-button" id="menuButton" aria-label="Abrir menu">☰</button>
+        <div class="crumbs" id="breadcrumbs"></div>
+      </header>
+
+      <div class="page-grid">
+        <article class="article-column">
+          <section class="hero-panel">
+            <p class="eyebrow" id="pageSection">Base de conhecimento</p>
+            <h1 id="pageTitle">Central de Ajuda IGUITECH</h1>
+            <p id="pageSummary">Encontre guias por categoria, pesquise por recurso e navegue sem recarregar a página.</p>
+          </section>
+
+          <section class="doc" id="docContent"></section>
+          <nav class="page-nav" id="pageNav" aria-label="Navegação entre páginas"></nav>
+        </article>
+
+        <aside class="page-aside" aria-label="Nesta página">
+          <div class="outline-card">
+            <strong>Nesta página</strong>
+            <nav id="pageOutline"></nav>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <div class="theme-switcher" aria-label="Tema da tela">
+    <button id="lightTheme" aria-label="Usar modo dia">☀</button>
+    <button id="darkTheme" aria-label="Usar modo noite">☾</button>
+  </div>
+
+  <script src="data/pages.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
